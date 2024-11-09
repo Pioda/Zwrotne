@@ -1,5 +1,3 @@
-using AutoFixture;
-using AutoFixture.AutoMoq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.MsSql;
@@ -7,18 +5,16 @@ using Xunit;
 using Zwrotne.IoC;
 
 namespace Zwrotne.IntegrationTests;
-public class TestsBase : IAsyncDisposable
+public class TestsFixture : IAsyncLifetime
 {
-    public Fixture fixture { get; init; }
-    public IServiceProvider serviceProvider { get; init; }
-    private MsSqlContainer dbContainer;
-    public TestsBase()
-    {
-        fixture = new();
-        fixture.Customize(new AutoMoqCustomization());
+    public IServiceProvider serviceProvider { get; private set; }
 
+    private MsSqlContainer dbContainer;
+
+    public async Task InitializeAsync()
+    {
         dbContainer = new MsSqlBuilder().Build();
-        dbContainer.StartAsync().Wait();
+        await dbContainer.StartAsync();
 
         string connString = dbContainer.GetConnectionString();
 
@@ -33,18 +29,16 @@ public class TestsBase : IAsyncDisposable
         serviceProvider = new ServiceCollection()
             .Setup(config)
             .BuildServiceProvider();
-
     }
 
-    public async ValueTask DisposeAsync()
+    public async Task DisposeAsync()
     {
         await dbContainer.DisposeAsync();
     }
 }
 
-
 [CollectionDefinition(Constants.IntegrationTests)]
-public class TestsCollectionDefinition : ICollectionFixture<TestsBase>
+public class TestsCollectionDefinition : ICollectionFixture<TestsFixture>
 {
 
 }
