@@ -12,4 +12,12 @@ public class ZwrotneDbContext : DbContext
 
     public DbSet<FeatureRequest> FeatureRequests { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Vote>()
+            .HasDiscriminator<VoteType>(x => x.Type);
+
+    }
+
 }

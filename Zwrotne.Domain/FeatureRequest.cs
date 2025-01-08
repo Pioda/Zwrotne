@@ -1,9 +1,11 @@
-﻿namespace Zwrotne.Domain;
+﻿using System.Globalization;
+
+namespace Zwrotne.Domain;
 
 public class FeatureRequest
 {
-    protected FeatureRequest() { } 
-    public FeatureRequest(string text, string title)
+    protected FeatureRequest() { }
+    public FeatureRequest(string text, string title, Board board)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -17,10 +19,12 @@ public class FeatureRequest
 
         Text = text;
         Title = title;
+        Board = board;
     }
 
-    public Guid Id { get; protected set; } = Guid.NewGuid();
+    public Guid Id { get; init; } = Guid.NewGuid();
     public string Text { get; protected set; }
     public string Title { get; protected set; }
-    public int Upvotes { get; set; }
+    public virtual Board Board { get; set; }
+
 }
